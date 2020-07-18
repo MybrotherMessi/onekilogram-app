@@ -1,6 +1,4 @@
-import "react-native-gesture-handler";
-import * as React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Signup from "../screens/Auth/Signup";
 import Confirm from "../screens/Auth/Confirm";
@@ -11,24 +9,11 @@ const AuthNavigation = createStackNavigator();
 
 export default () => {
   return (
-    <NavigationContainer>
-      <AuthNavigation.Navigator
-        initialRouteName="AuthHome"
-        headerMode="none"
-        mode="card"
-        screenOptions={{
-          gestureEnabled: true,
-          gestureDirection: "horizontal",
-          gestureResponseDistance: {
-            horizontal: 300,
-          },
-        }}
-      >
-        <AuthNavigation.Screen name="AuthHome" component={AuthHome} />
-        <AuthNavigation.Screen name="Login" component={Login} />
-        <AuthNavigation.Screen name="Signup" component={Signup} />
-        <AuthNavigation.Screen name="Confirm" component={Confirm} />
-      </AuthNavigation.Navigator>
-    </NavigationContainer>
+    <AuthNavigation.Navigator initialRouteName="AuthHome" headerMode="none">
+      <AuthNavigation.Screen name="AuthHome" component={AuthHome} />
+      <AuthNavigation.Screen name="Login" component={Login} />
+      <AuthNavigation.Screen name="Signup" component={Signup} />
+      <AuthNavigation.Screen name="Confirm" component={Confirm} />
+    </AuthNavigation.Navigator>
   );
 };

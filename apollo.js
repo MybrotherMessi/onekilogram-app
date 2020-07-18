@@ -1,5 +1,7 @@
+const KEY = "http://192.168.178.21:4000";
+
 const options = {
-  uri: "http://localhost:4000",
+  uri: KEY,
 };
 
 export default options;
