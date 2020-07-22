@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Alert, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { useMutation } from "@apollo/react-hooks";
+import * as Facebook from "expo-facebook";
+import * as Google from "expo-google-app-auth";
 
 import AuthButton from "../../Components/AuthButton";
 import AuthInput from "../../Components/AuthInput";
@@ -14,7 +16,17 @@ const View = styled.View`
   flex: 1;
 `;
 
-const Text = styled.Text``;
+const FbContainer = styled.View`
+  margin-top: 50px;
+  padding-top: 50px;
+  border-color: ${(props) => props.theme.lightGreyColor};
+  border-style: solid;
+  border-top-width: 1px;
+`;
+
+const GoogleContainer = styled.View`
+  margin-top: 25px;
+`;
 
 export default ({ route, navigation }) => {
   const emailInput = useInput(route.params ? route.params.email : "");
@@ -64,6 +76,60 @@ export default ({ route, navigation }) => {
     }
   };
 
+  const FbHandler = async () => {
+    try {
+      setLoading(true);
+      await Facebook.initializeAsync(process.env.FACEBOOK_APP_ID);
+      const { type, token } = await Facebook.logInWithReadPermissionsAsync({
+        permissions: ["public_profile", "email"],
+      });
+      if (type === "success") {
+        const response = await fetch(
+          `https://graph.facebook.com/me?access_token=${token}&fields=id,first_name,last_name,email`
+        );
+        const { email, first_name, last_name } = await response.json();
+        updateFormData(email, first_name, last_name);
+        setLoading(false);
+      } else {
+        // type === 'cancel'
+      }
+    } catch ({ message }) {
+      alert(`Facebook Login Error: ${message}`);
+    }
+  };
+
+  const GoogleHandler = async () => {
+    const GOOGLE_APP_ID = process.env.GOOGLE_APP_ID;
+    try {
+      setLoading(true);
+      const result = await Google.logInAsync({
+        androidClientId: GOOGLE_APP_ID,
+        scopes: ["profile", "email"],
+      });
+      if (result.type === "success") {
+        const user = await fetch("https://www.googleapis.com/userinfo/v2/me", {
+          headers: { Authorization: `Bearer ${result.accessToken}` },
+        });
+        const { email, given_name, family_name } = await user.json();
+        updateFormData(email, given_name, family_name);
+      } else {
+        return { cancelled: true };
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateFormData = (email, firstName, lastName) => {
+    emailInput.setValue(email);
+    fNameInput.setValue(firstName);
+    lNameInput.setValue(lastName);
+    const [username] = email.split("@");
+    userNameInput.setValue(username);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View>
@@ -90,6 +156,22 @@ export default ({ route, navigation }) => {
           autoCorrect={false}
         />
         <AuthButton loading={loading} text="Sign Up" onPress={handleSignup} />
+        <FbContainer>
+          <AuthButton
+            loading={false}
+            onPress={FbHandler}
+            text="Connect Facebook"
+            bgColor={"#2D4DA7"}
+          />
+        </FbContainer>
+        <GoogleContainer>
+          <AuthButton
+            loading={false}
+            onPress={GoogleHandler}
+            text="Connect Google"
+            bgColor={"#EE1922"}
+          />
+        </GoogleContainer>
       </View>
     </TouchableWithoutFeedback>
   );
