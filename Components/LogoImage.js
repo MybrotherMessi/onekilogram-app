@@ -7,10 +7,10 @@ const View = styled.View`
   flex: 1;
 `;
 
-const Text = styled.Text``;
+const Image = styled.Image``;
 
 export default () => (
   <View>
-    <Text>Search</Text>
+    <Image source={require("../assets/logo.png")} />
   </View>
 );

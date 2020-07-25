@@ -12,6 +12,6 @@ const Text = styled.Text``;
 
 export default () => (
   <View>
-    <Text>Upload Photo</Text>
+    <Text>Profile</Text>
   </View>
 );
