@@ -5,6 +5,7 @@ import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
 
 import Loader from "../../Components/Loader";
+import Post from "../../Components/Post";
 
 const FEED_QUERY = gql`
   {
@@ -43,8 +44,6 @@ const View = styled.View`
   background-color: white;
 `;
 
-const Text = styled.Text``;
-
 export default () => {
   const [refreshing, setRefreshing] = useState(false);
   const { loading, data, refetch } = useQuery(FEED_QUERY);
@@ -64,7 +63,13 @@ export default () => {
         <RefreshControl refreshing={refreshing} onRefresh={refresh} />
       }
     >
-      {loading ? <Loader /> : <Text>hihihihi</Text>}
+      {loading ? (
+        <Loader />
+      ) : (
+        data &&
+        data.seeFeed &&
+        data.seeFeed.map((post) => <Post key={post.id} {...post} />)
+      )}
     </ScrollView>
   );
 };
