@@ -6,35 +6,15 @@ import { useQuery } from "@apollo/react-hooks";
 
 import Loader from "../../Components/Loader";
 import Post from "../../Components/Post";
+import { POST_FRAGMENT } from "../../fragments";
 
 const FEED_QUERY = gql`
   {
     seeFeed {
-      id
-      location
-      caption
-      user {
-        id
-        avatar
-        userName
-      }
-      files {
-        id
-        url
-      }
-      likeCount
-      isLiked
-      comments {
-        id
-        text
-        user {
-          id
-          userName
-        }
-      }
-      createdAt
+      ...PostParts
     }
   }
+  ${POST_FRAGMENT}
 `;
 
 const View = styled.View`

@@ -1,6 +1,8 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+
 import { stackStyles } from "./config";
+import Detail from "../screens/Detail";
 
 const stackFactory = createStackNavigator();
 
@@ -17,6 +19,11 @@ export default ({ route }) => {
         name={route.name}
         component={initialRoute}
         options={customConfig}
+      />
+      <stackFactory.Screen
+        name="Detail"
+        component={Detail}
+        options={{ title: "Photo" }}
       />
     </stackFactory.Navigator>
   );
