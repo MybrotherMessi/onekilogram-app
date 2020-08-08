@@ -104,6 +104,7 @@ export default () => {
                   ? "md-heart"
                   : "md-heart-empty"
               }
+              focused={focused}
             />
           ),
         }}

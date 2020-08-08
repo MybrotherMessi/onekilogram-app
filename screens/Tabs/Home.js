@@ -1,14 +1,19 @@
 import React, { useState } from "react";
-import { ScrollView, RefreshControl } from "react-native";
+import {
+  ScrollView,
+  RefreshControl,
+  FlatList,
+  View,
+  Dimensions,
+} from "react-native";
 import styled from "styled-components";
 import { gql } from "apollo-boost";
-import { useQuery } from "@apollo/react-hooks";
-
 import Loader from "../../Components/Loader";
+import { useQuery } from "@apollo/react-hooks";
 import Post from "../../Components/Post";
 import { POST_FRAGMENT } from "../../fragments";
 
-const FEED_QUERY = gql`
+export const FEED_QUERY = gql`
   {
     seeFeed {
       ...PostParts
@@ -17,17 +22,11 @@ const FEED_QUERY = gql`
   ${POST_FRAGMENT}
 `;
 
-const View = styled.View`
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  background-color: white;
-`;
-
 export default () => {
   const [refreshing, setRefreshing] = useState(false);
   const { loading, data, refetch } = useQuery(FEED_QUERY);
-  const refresh = async () => {
+  const [page, setPage] = useState(1);
+  const onRefresh = async () => {
     try {
       setRefreshing(true);
       await refetch();
@@ -37,19 +36,21 @@ export default () => {
       setRefreshing(false);
     }
   };
+
   return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={refresh} />
-      }
-    >
+    <View>
       {loading ? (
         <Loader />
       ) : (
-        data &&
-        data.seeFeed &&
-        data.seeFeed.map((post) => <Post key={post.id} {...post} />)
+        <FlatList
+          data={data && data.seeFeed}
+          renderItem={({ item }) => <Post item={item} key={item.id} />}
+          onEndReachedThreshold={1}
+          initialNumToRender={5}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
+        />
       )}
-    </ScrollView>
+    </View>
   );
 };

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Image, Platform } from "react-native";
+import { Image, Platform, FlatList } from "react-native";
 import styled from "styled-components";
 import PropTypes from "prop-types";
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
 import Swiper from "react-native-swiper";
 import { Ionicons, SimpleLineIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 import constants from "../constants";
 import styles from "../styles";
@@ -68,20 +69,12 @@ const CaptionContainer = styled.Text`
   margin-bottom: 5px;
 `;
 
-const Post = ({
-  id,
-  user,
-  location,
-  files = [],
-  likeCount: likeCountProp,
-  caption,
-  comments = [],
-  isLiked: isLikedProp,
-}) => {
-  const [isLiked, setIsLiked] = useState(isLikedProp);
-  const [likeCount, setLikeCount] = useState(likeCountProp);
+const Post = ({ item }) => {
+  const navigation = useNavigation();
+  const [isLiked, setIsLiked] = useState(item.isLiked);
+  const [likeCount, setLikeCount] = useState(item.likeCount);
   const [toggleLikeMutation] = useMutation(TOGGLE_LIKE, {
-    variables: { postId: id },
+    variables: { postId: item.id },
   });
   const handleLike = async () => {
     if (isLiked === true) {
@@ -96,12 +89,19 @@ const Post = ({
       console.log(e);
     }
   };
+
   return (
     <Container>
       <Header>
-        <Touchable>
+        <Touchable
+          onPress={() =>
+            navigation.navigate("UserDetail", {
+              userName: item.user.userName,
+            })
+          }
+        >
           <Image
-            source={{ uri: user.avatar }}
+            source={{ uri: item.user.avatar }}
             style={{
               height: 40,
               width: 40,
@@ -112,8 +112,16 @@ const Post = ({
           />
         </Touchable>
         <HeaderUserContainer>
-          <NameText>{user.userName}</NameText>
-          <Location>{location}</Location>
+          <Touchable
+            onPress={() =>
+              navigation.navigate("UserDetail", {
+                userName: item.user.userName,
+              })
+            }
+          >
+            <NameText>{item.user.userName}</NameText>
+            <Location>{item.location}</Location>
+          </Touchable>
         </HeaderUserContainer>
       </Header>
       <Swiper
@@ -122,7 +130,7 @@ const Post = ({
         dotStyle={{ width: 6, height: 6 }}
         activeDotStyle={{ width: 6, height: 6 }}
       >
-        {files.map((file) => (
+        {item.files.map((file) => (
           <Image
             style={{
               width: constants.width,
@@ -164,12 +172,11 @@ const Post = ({
           </BoldText>
         </Touchable>
         <CaptionContainer numberOfLines={50}>
-          <NameText>{user.userName} </NameText>
-          <Text>{caption}</Text>
+          <NameText>{item.user.userName} </NameText>
+          <Text>{item.caption}</Text>
         </CaptionContainer>
-
         <Touchable>
-          <LightGreyText>See all {comments.length} comments</LightGreyText>
+          <LightGreyText>See all {item.comments.length} comments</LightGreyText>
         </Touchable>
       </InfoContainer>
     </Container>
@@ -177,33 +184,35 @@ const Post = ({
 };
 
 Post.propTypes = {
-  id: PropTypes.string.isRequired,
-  user: PropTypes.shape({
+  item: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    avatar: PropTypes.string,
-    userName: PropTypes.string.isRequired,
-  }).isRequired,
-  files: PropTypes.arrayOf(
-    PropTypes.shape({
+    user: PropTypes.shape({
       id: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  likeCount: PropTypes.number.isRequired,
-  isLiked: PropTypes.bool.isRequired,
-  comments: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
-      user: PropTypes.shape({
+      avatar: PropTypes.string,
+      userName: PropTypes.string.isRequired,
+    }).isRequired,
+    files: PropTypes.arrayOf(
+      PropTypes.shape({
         id: PropTypes.string.isRequired,
-        userName: PropTypes.string.isRequired,
-      }).isRequired,
-    })
-  ).isRequired,
-  caption: PropTypes.string.isRequired,
-  location: PropTypes.string,
-  createdAt: PropTypes.string.isRequired,
+        url: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+    likeCount: PropTypes.number.isRequired,
+    isLiked: PropTypes.bool.isRequired,
+    comments: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        text: PropTypes.string.isRequired,
+        user: PropTypes.shape({
+          id: PropTypes.string.isRequired,
+          userName: PropTypes.string.isRequired,
+        }).isRequired,
+      })
+    ).isRequired,
+    caption: PropTypes.string.isRequired,
+    location: PropTypes.string,
+    createdAt: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
-export default Post;
+export default React.memo(Post);

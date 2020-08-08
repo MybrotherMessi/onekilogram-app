@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import { stackStyles } from "./config";
 import Detail from "../screens/Detail";
+import UserDetail from "../screens/UserDetail";
 
 const stackFactory = createStackNavigator();
 
@@ -24,6 +25,11 @@ export default ({ route }) => {
         name="Detail"
         component={Detail}
         options={{ title: "Photo" }}
+      />
+      <stackFactory.Screen
+        name="UserDetail"
+        component={UserDetail}
+        options={{ title: route.state?.routes[1]?.params?.userName }}
       />
     </stackFactory.Navigator>
   );

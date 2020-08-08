@@ -8,6 +8,7 @@ import useInput from "../../hooks/useInput";
 import SearchBar from "../../Components/SearchBar";
 import SquarePhoto from "../../Components/SquarePhoto";
 import Loader from "../../Components/Loader";
+import { useNavigation } from "@react-navigation/native";
 
 export const SEARCH = gql`
   query search($term: String!) {
@@ -27,7 +28,8 @@ const ColumnContainer = styled.View`
   flex: 1;
 `;
 
-export default ({ navigation }) => {
+export default () => {
+  const navigation = useNavigation();
   const searchInput = useInput("");
   const [shouldFetch, setShouldFetch] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -62,7 +64,6 @@ export default ({ navigation }) => {
       />
     ),
   });
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ColumnContainer>

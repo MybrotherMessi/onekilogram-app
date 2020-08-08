@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import constants from "../constants";
 
-const SquarePhoto = ({ item, id }) => {
+const SquarePhoto = ({ item = [], id }) => {
   const navigation = useNavigation();
   return (
     <TouchableOpacity onPress={() => navigation.navigate("Detail", { item })}>

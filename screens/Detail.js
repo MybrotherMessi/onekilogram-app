@@ -1,12 +1,10 @@
 import React from "react";
-import { ScrollView } from "react-native";
-import styled from "styled-components";
-import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
-
-import Post from "../Components/Post";
-import Loader from "../Components/Loader";
+import { gql } from "apollo-boost";
 import { POST_FRAGMENT } from "../fragments";
+import Loader from "../Components/Loader";
+import Post from "../Components/Post";
+import { View, FlatList } from "react-native";
 
 const POST_DETAIL = gql`
   query seeFullPost($id: String!) {
@@ -17,24 +15,36 @@ const POST_DETAIL = gql`
   ${POST_FRAGMENT}
 `;
 
-const View = styled.View`
-  flex: 1;
-`;
-
 export default ({ route }) => {
   const { id } = route.params.item;
-  const { data, loading } = useQuery(POST_DETAIL, {
-    variables: {
-      id: id,
-    },
+  const [refreshing, setRefreshing] = useState(false);
+  const { loading, data } = useQuery(POST_DETAIL, {
+    variables: { id: id },
   });
+  const arr = [data.seeFullPost];
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await refetch();
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
-    <ScrollView>
+    <View>
       {loading ? (
         <Loader />
       ) : (
-        data && data.seeFullPost && <Post {...data.seeFullPost} />
+        <FlatList
+          data={arr}
+          renderItem={({ item }) => <Post item={item} key={item.id} />}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
+        />
       )}
-    </ScrollView>
+    </View>
   );
 };
