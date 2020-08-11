@@ -45,8 +45,6 @@ export default () => {
         <FlatList
           data={data && data.seeFeed}
           renderItem={({ item }) => <Post item={item} key={item.id} />}
-          onEndReachedThreshold={1}
-          initialNumToRender={5}
           onRefresh={onRefresh}
           refreshing={refreshing}
         />

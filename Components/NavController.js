@@ -9,7 +9,7 @@ export default () => {
   const isLoggedIn = useIsLoggedIn();
   return (
     <NavigationContainer>
-      {isLoggedIn ? <MainNavigation /> : <AuthNavigation />}
+      <MainNavigation />
     </NavigationContainer>
   );
 };
